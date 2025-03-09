@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+
+
+  io_main:
+    build:
+#      context: ./io_main/
+      dockerfile: Dockerfile
+    hostname: io_main
+    network_mode: "host"
+    privileged: true
+    volumes:
+      - /etc/revpi/config.rsc:/etc/revpi/config.rsc
+      - /dev/piControl0:/dev/piControl0
+    environment:
+      - VESSEL_ID
+#      - MQTT_USER
+#      - MQTT_PWD
+      - MQTT_USER=vnno
+      - MQTT_PWD=Planetvegen18A
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+    restart: unless-stopped
+#    depends_on:
+#      - mosquitto

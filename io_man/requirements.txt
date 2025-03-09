@@ -1,0 +1,3 @@
+paho-mqtt==1.5.1
+revpimodio2==2.7.1
+#dotenv==0.0.1

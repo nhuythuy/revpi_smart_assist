@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+
+
+  io_main:
+    build:
+      context: ./io_main/
+#      context: ./canx_to_mqtt/
+      dockerfile: Dockerfile
+    hostname: io_main
+    volumes:
+      - /etc/revpi/config.rsc:/etc/revpi/config.rsc
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+    restart: unless-stopped
+#    depends_on:
+#      - mosquitto
