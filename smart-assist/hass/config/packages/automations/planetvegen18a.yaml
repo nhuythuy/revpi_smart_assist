@@ -1,0 +1,283 @@
+- id: '1710876914861'
+  alias: Gara vibration detected
+  description: ''
+  trigger:
+  - type: vibration
+    platform: device
+    device_id: 698f4e7a4144c93c869d917d8f422078
+    entity_id: 1d6f573748143abf55c17c40c27101f6
+    domain: binary_sensor
+  condition: []
+  action:
+  - service: notify.mobile_app_thuy
+    metadata: {}
+    data:
+      message: Gara door activated! - Cửa gara động!
+      title: Warning! - Cảnh báo
+  mode: single
+- id: '1711657029170'
+  alias: Main door opened
+  description: When main door opened
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.entrance_main_door
+    from: 'True'
+    to: 'False'
+  condition: []
+  action:
+  - service: notify.mobile_app_thuy
+    metadata: {}
+    data:
+      message: Main door opened!
+      title: Door opened
+  - service: notify.mobile_app_tony
+    metadata: {}
+    data:
+      message: Main door opened
+      title: Door opened
+  mode: single
+- id: '1711662671194'
+  alias: Back door opened
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.back_door
+    from: 'True'
+    to: 'False'
+  condition: []
+  action:
+  - service: notify.mobile_app_thuy
+    metadata: {}
+    data:
+      title: Door opened
+      message: Back door opened!
+  - service: notify.mobile_app_tony
+    metadata: {}
+    data:
+      message: Back door openeed! / Cửa sau mở!
+      title: Door opened / Cửa mở
+  mode: single
+- id: '1711735375511'
+  alias: Basement door opened
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.basement_door
+    from: 'False'
+    to: 'True'
+  condition: []
+  action:
+  - service: notify.mobile_app_thuy
+    metadata: {}
+    data:
+      message: Basement door opened!
+      title: Door opened
+  mode: single
+- id: '1711735561615'
+  alias: Storage basement door opened
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.storage_basement_door
+    from: 'False'
+    to: 'True'
+  condition: []
+  action:
+  - service: notify.mobile_app_thuy
+    metadata: {}
+    data:
+      message: Storage basement door opened!
+      title: Door opened
+  mode: single
+- id: '1711735642944'
+  alias: Stair basement door opened
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.stair_basement_door
+    from: 'False'
+    to: 'True'
+  condition: []
+  action:
+  - service: notify.mobile_app_thuy
+    metadata: {}
+    data:
+      message: Stair basement door opened!
+      title: Door opened!
+  mode: single
+- id: '1711881718398'
+  alias: Cửa trước mở lâu
+  description: Sends a notification if the sensor state equals 1 for longer than 1
+    minutes
+  triggers:
+  - entity_id: sensor.entrance_main_door
+    to: 'False'
+    for:
+      minutes: 1
+    trigger: state
+  actions:
+  - data:
+      title: Cửa trước mở lâu
+      message: Cửa trước mở lâu quá, hơn 1 phút!!!
+    action: notify.mobile_app_thuy
+  mode: single
+- id: '1713295534673'
+  alias: AutoTurnEntranceLightOn
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.entrance_light_auto_set
+    - sun.sun
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - service: mqtt.publish
+    metadata: {}
+    data:
+      qos: '1'
+      retain: true
+      topic: home/entrance/light/auto
+      payload: 'on'
+  mode: single
+- id: '1713295874328'
+  alias: AutoTurnEntranceLightOff
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.entrance_light_auto_set
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - service: mqtt.publish
+    metadata: {}
+    data:
+      qos: '1'
+      retain: true
+      topic: home/entrance/light/auto
+      payload: 'off'
+  mode: single
+- id: '1713296069540'
+  alias: SunAutoTurnEntranceLightOn
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sun.sun
+    from: above_horizon
+    to: below_horizon
+  condition: []
+  action:
+  - service: mqtt.publish
+    metadata: {}
+    data:
+      qos: '0'
+      retain: true
+      topic: home/entrance/light/auto/set
+      payload: 'on'
+  mode: single
+- id: '1713296211993'
+  alias: SunAutoTurnEntranceLightOff
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sun.sun
+    from: below_horizon
+    to: above_horizon
+    for:
+      hours: 1
+      minutes: 0
+      seconds: 0
+  condition: []
+  action:
+  - service: mqtt.publish
+    metadata: {}
+    data:
+      qos: '0'
+      retain: true
+      topic: home/entrance/light/auto/set
+      payload: 'off'
+  mode: single
+- id: '1715104642686'
+  alias: Waste light basement ON
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.storage_basement_light
+    to: 'True'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+  condition:
+  - condition: state
+    entity_id: sensor.stair_basement_door
+    state: 'False'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+  action:
+  - service: notify.mobile_app_thuy
+    metadata: {}
+    data:
+      message: Light basement ON unused!!!
+      title: Waste light basement
+  mode: single
+- id: '1715262082006'
+  alias: SetServiceName
+  description: ''
+  trigger:
+  - platform: time
+    at: 00:00:00
+  condition: []
+  action:
+  - service: input_text.set_value
+    metadata: {}
+    data:
+      value: Core
+    target:
+      entity_id: input_text.servicenames
+  mode: single
+- id: '1735321316877'
+  alias: Cửa hầm mở lâu
+  description: Sends a notification if the sensor state equals 1 for longer than 1
+    minutes
+  triggers:
+  - entity_id: sensor.basement_door
+    to: 'True'
+    for:
+      minutes: 1
+    trigger: state
+  actions:
+  - data:
+      title: Cửa hầm mở lâu
+      message: Cửa hầm mở lâu quá, hơn 1 phút!!!
+    action: notify.mobile_app_thuy
+  mode: single
+- id: '1735321356212'
+  alias: Cửa cầu thang mở lâu
+  description: Sends a notification if the sensor state equals 1 for longer than 1
+    minutes
+  triggers:
+  - entity_id: sensor.stair_basement_door
+    to: 'True'
+    for:
+      minutes: 1
+    trigger: state
+  actions:
+  - data:
+      title: Cửa cầu thang mở lâu
+      message: Cửa cầu thang mở lâu quá, hơn 1 phút!!!
+    action: notify.mobile_app_thuy
+  mode: single

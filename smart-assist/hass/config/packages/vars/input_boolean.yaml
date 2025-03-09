@@ -1,0 +1,18 @@
+  log_enable:
+    name: Log Enable
+    icon: mdi:toggle-switch
+
+
+  trip1_enable:
+    name: Trip 1 Enable
+    icon: mdi:toggle-switch
+
+
+  trip2_enable:
+    name: Trip 2 Enable
+    icon: mdi:toggle-switch
+
+  clear_logs:
+    name: Clear Logs
+    initial: off
+    icon: mdi:delete

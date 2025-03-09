@@ -1,0 +1,46 @@
+  trip1_dt0:
+    name: Start
+    #initial: "-"
+    has_date: true
+    has_time: true
+
+  trip1_dt1:
+    name: Stop
+   # initial: "-"
+    has_date: true
+    has_time: true
+
+  trip2_dt0:
+    name: Start
+    #initial: "-"
+    has_date: true
+    has_time: true
+
+  trip2_dt1:
+    name: Stop
+    #initial: "-"
+    has_date: true
+    has_time: true
+
+### Fuel logging rework:
+
+  t1dt0: #trip 1, start
+    name: Start
+    has_date: true
+    has_time: true
+
+  t1dt1: #trip 1, stop
+    name: Stop
+    has_date: true
+    has_time: true
+
+  t2dt0: #trip 2, start
+    name: Start
+    has_date: true
+    has_time: true
+
+  t2dt1: #trip 2, stop
+    name: Stop
+    has_date: true
+    has_time: true
+

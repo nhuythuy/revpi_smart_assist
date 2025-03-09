@@ -1,0 +1,41 @@
+
+  - name: "House1 Door 1"
+    icon: mdi:numeric-1-box-outline
+    state: "{{ states('sensor.entrance_main_door') }}"
+    attributes:
+      fname: "Main"
+      open_duration: "{{ states('sensor.entrance_main_door_opened_duration') }}"
+      temp: "Door1"
+
+  - name: "House1 Door 2"
+    icon: mdi:numeric-2-box-outline
+    state: "{{ states('sensor.back_door') }}"
+    attributes:
+      fname: "Back"
+      open_duration: "{{ states('sensor.back_door_opened_duration') }}"
+      temp: "Door2"
+
+  - name: "House1 Door 3"
+    icon: mdi:numeric-3-box-outline
+    state: "{{ states('sensor.basement_door') }}"
+    attributes:
+      fname: "Basement"
+      open_duration: "{{ states('sensor.basement_door_opened_duration') }}"
+      temp: "Door3"
+
+  - name: "House1 Door 4"
+    icon: mdi:numeric-4-box-outline
+    state: "{{ states('sensor.stair_basement_door') }}"
+    attributes:
+      fname: "StairBasement"
+      open_duration: "{{ states('sensor.stair_basement_door_opened_duration') }}"
+      temp: "Door4"
+
+  - name: "House1 Door 5"
+    icon: mdi:numeric-5-box-outline
+    state: "{{ states('sensor.storage_basement_door') }}"
+    attributes:
+      fname: "StorageBasement"
+      open_duration: "{{ states('sensor.storage_basement_door_opened_duration') }}"
+      temp: "Door5"
+

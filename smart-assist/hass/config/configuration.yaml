@@ -1,0 +1,78 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /www/community/lovelace-card-mod/card-mod.js
+
+#automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+
+homeassistant:
+  #packages: !include_dir_named packages
+  packages: 
+    mm: !include packages/vnno_components.yaml
+  name: Home
+  latitude: 9.9
+  longitude: -9.9
+  elevation: 99
+
+
+
+mqtt:
+  sensor: !include_dir_merge_list packages/mqtt_sensors/
+
+input_boolean:
+  set_camerax:
+    name: Chromecast Radio
+    
+switch:
+  - platform: template
+    switches:
+
+# Auto/Manual control entrance light
+      sw_entrance_light_auto:
+        friendly_name: "Sw Entrance Light Auto"
+        value_template: "{{ is_state('input_boolean.entrance_light_auto', 'on') }}"
+        turn_on:
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.entrance_light_auto
+          - service: mqtt.publish
+            data:
+              topic: "home/entrance/light/auto"
+              payload: "on"
+              retain: true
+        turn_off:
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.entrance_light_auto
+          - service: mqtt.publish
+            data:
+              topic: "home/entrance/light/auto"
+              payload: "off"
+              retain: true
+              
+      sw_entrance_light_manual_set:
+        friendly_name: "Sw Entrance Light Manual Set"
+        value_template: "{{ is_state('input_boolean.entrance_light_manual_set', 'on') }}"
+        turn_on:
+          - service: input_boolean.turn_on
+            entity_id: input_boolean.entrance_light_manual_set
+          - service: mqtt.publish
+            data:
+              topic: "home/entrance/light/manual/set"
+              payload: "on"
+              retain: true
+        turn_off:
+          - service: input_boolean.turn_off
+            entity_id: input_boolean.entrance_light_manual_set
+          - service: mqtt.publish
+            data:
+              topic: "home/entrance/light/manual/set"
+              payload: "off"
+              retain: true
+            

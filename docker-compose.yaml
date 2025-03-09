@@ -1,6 +1,24 @@
 version: "3.9"
 services:
 
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+
+      - ./mosquitto/config:/mosquitto/config:rw
+      - ./mosquitto/data:/mosquitto/data:rw
+      - ./mosquitto/log:/mosquitto/log:rw
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "5"
+
 
   io_main:
     build:
@@ -18,3 +36,47 @@ services:
     restart: unless-stopped
 #    depends_on:
 #      - mosquitto
+
+
+
+  homeassistant:
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    container_name: "smart-assist-homeassistant"
+    network_mode: "host"
+    volumes:
+      - ./smart-assist/hass/config:/config
+      - ./smart-assist/hass/localtime:/etc/localtime:ro
+    restart: "unless-stopped"
+    privileged: true
+
+  smart_assist:
+    build: "./smart-assist/appdaemon"
+    container_name: "smart-assist-appdaemon"
+    network_mode: "host"
+    volumes:
+      - ./smart-assist/appdaemon/config:/conf
+      - ./smart-assist/appdaemon/config/appdaemon.yaml:/conf/appdaemon.yaml
+      - ./smart-assist/appdaemon/source:/conf/apps/
+
+    restart: "on-failure"
+    depends_on:
+     - "homeassistant"
+
+
+# https://github.com/linuxserver/docker-duckdns
+# https://pimylifeup.com/raspberry-pi-duck-dns/
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: duckdns
+    network_mode: host #optional
+    environment:
+      - PUID=1000 #optional
+      - PGID=1000 #optional
+      - TZ=Etc/UTC #optional
+      - SUBDOMAINS=planetvegen18a,vnno
+      - TOKEN=6517266d-42e7-4bfc-8691-566fe78b4a54
+      - UPDATE_IP=ipv4 #optional
+      - LOG_FILE=false #optional
+    volumes:
+      - ./duckdns/config:/config #optional
+    restart: unless-stopped

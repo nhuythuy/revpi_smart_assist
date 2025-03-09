@@ -1,0 +1,89 @@
+  trip_log:
+    attributes:
+      start: none
+      end: none
+      duration: none
+      trip: none
+      note: ""
+      valid: false
+    initial_value: null
+
+  trip_log1:
+    attributes:
+      start: ""
+      end: ""
+      duration: ""
+      trip: ""
+      note: ""
+      valid: false
+    initial_value: null
+
+  trip_log2:
+    attributes:
+      start: ""
+      end: ""
+      duration: ""
+      trip: ""
+      note: ""
+      valid: false
+    initial_value: null
+
+  trip_log3:
+    attributes:
+      start: ""
+      end: ""
+      duration: ""
+      trip: ""
+      note: ""
+      valid: false
+    initial_value: null
+
+  trip_log4:
+    attributes:
+      start: ""
+      end: ""
+      duration: ""
+      trip: ""
+      note: ""
+      valid: false
+    initial_value: null
+
+  trip_log5:
+    attributes:
+      start: ""
+      end: ""
+      duration: ""
+      trip: ""
+      note: ""
+      valid: false
+    initial_value: null
+
+  trip_log6:
+    attributes:
+      start: ""
+      end: ""
+      duration: ""
+      trip: ""
+      note: ""
+      valid: false
+    initial_value: null
+
+  trip_log7:
+    attributes:
+      start: ""
+      end: ""
+      duration: ""
+      trip: ""
+      note: ""
+      valid: false
+    initial_value: null
+
+  trip_log8:
+    attributes:
+      start: ""
+      end: ""
+      duration: ""
+      trip: ""
+      note: ""
+      valid: false
+    initial_value: null

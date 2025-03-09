@@ -1,0 +1,10 @@
+# BN282
+
+mqttParser01:
+  module: mqttparser 
+  class: Mqttparser
+  subscribe_topic: core/monitor/service/status
+  publish_topic: hass/core/monitor/service/status
+  attributes:
+  alias:
+

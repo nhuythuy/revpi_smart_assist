@@ -1,0 +1,20 @@
+
+- name: "Main"
+  state: "{{ states('sensor.entrance_main_door') }}"
+#    not: "{{ state_attr('sensor.entrance_main_door') }}"
+
+- name: DoorMainY
+  state: "{{ states('sensor.entrance_main_door'), states('sensor.entrance_main_door_opened_duration') }}"
+
+
+- name: MainDoorT
+  state: "{{ states('sensor.entrance_main_door') }}"
+  attributes:
+    state: "{{ state_attr('sensor.entrance_main_door') }}"
+    duration: "{{ state_attr('sensor.entrance_main_door_opened_duration') }}"
+  
+- name: MainDoor
+  state: "{{ states('sensor.entrance_main_door') }}"
+  attributes:
+    state: "{{ state_attr('sensor.entrance_main_door', 'state') }}"
+    duration: "{{ state_attr('sensor.entrance_main_door_opened_duration', 'duration') }}"

@@ -1,0 +1,81 @@
+  trip1_time0:
+    name: Start
+    initial: "-"
+    min: 0
+    max: 100
+
+  trip1_time1:
+    name: Stop
+    initial: "-"
+    min: 0
+    max: 100
+
+  trip2_time0:
+    name: Start
+    initial: "-"
+    min: 0
+    max: 100
+
+  trip2_time1:
+    name: Stop
+    initial: "-"
+    min: 0
+    max: 100
+  t1_start_time:
+    name: T1 Start Time
+  t1_end_time:
+    name: T1 End Time
+  t2_start_time:
+    name: T2 Start Time
+  t2_end_time:
+    name: T2 End Time
+  trip1_log:
+    name: Trip1 Log
+    max: 1000  # Ensure enough space for a 10-entry log
+  trip2_log:
+    name: Trip2 Log
+    max: 1000
+  log_0:
+    name: Log 0
+    max: 255
+  log_1:
+    name: Log 1
+    max: 255
+  log_2:
+    name: Log 2
+    max: 255
+  log_3:
+    name: Log 3
+    max: 255
+  log_4:
+    name: Log 4
+    max: 255
+  log_5:
+    name: Log 5
+    max: 255
+  log_6:
+    name: Log 6
+    max: 255
+  log_7:
+    name: Log 7
+    max: 255
+  log_8:
+    name: Log 8
+    max: 255
+  log_9:
+    name: Log 9
+    max: 255
+  log_10:
+    name: Log 10
+    max: 255
+  t1_elapsed_time:
+    name: T1 Elapsed Time
+  t2_elapsed_time:
+    name: T2 Elapsed Time
+  log_export_text:
+    name: export_text
+    max: 2000
+  note_trip1:
+    name: Trip 1 Note
+  note_trip2:
+    name: Trip 2 Note

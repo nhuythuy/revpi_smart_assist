@@ -1,0 +1,135 @@
+- name: "DoorAll"
+  state_topic: "home/main/sensor/states"
+
+- name: "DoorMainX"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.main_door, value_json.main_door_lo |float|round(0) }}'
+
+#    - name: "Entrance Main Door Opened Duration"
+#      state_topic: "home/main/sensor/states"
+#      value_template: '{{ value_json.main_door_lo |float|round(0) }}'
+#      unit_of_measurement: "sec"      
+
+
+- name: "FW VERSION"
+  state_topic: "home/main/states"
+  value_template: '{{ value_json.app_version }}'
+
+- name: "CLOCK"
+  state_topic: "home/main/states"
+  value_template: '{{ value_json.clock |float|round(2) }}'
+
+- name: "RUNTIME"
+  state_topic: "home/main/states"
+  value_template: '{{ value_json.runtime }}'
+  unit_of_measurement: "min"
+
+
+- name: "Battery Voltage"
+  state_topic: "home/main/slow_sensors"
+  value_template: '{{ value_json.battery_volt |float|round(1) }}'
+  unit_of_measurement: "V"
+
+- name: "Battery Voltage PS"
+  state_topic: "home/main/slow_sensors"
+  value_template: '{{ value_json.battery_volt_ps |float|round(1) }}'
+  unit_of_measurement: "V"
+
+- name: "Basement Temperature"
+  state_topic: "home/main/slow_sensors"
+  value_template: '{{ value_json.basement_temp |float|round(1)}}'
+  unit_of_measurement: "C"
+
+- name: "Basement Humidity"
+  state_topic: "home/main/slow_sensors"
+  value_template: '{{ value_json.basement_humidity |float|round(1)}}'
+  unit_of_measurement: "%"
+
+
+# IO_MAN
+- name: "IO Man Version"
+#      unique_id: "io_man_version"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.io_man_version }}'
+
+- name: "Entrance Main Door"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.main_door }}'
+
+      
+- name: "Back Door"
+#      unique_id: "back_door"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.back_door }}'
+
+- name: "Basement Door"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.bm_door }}'
+
+- name: "Stair Basement Door"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.stair_bm_door }}'
+
+- name: "Storage Basement Door"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.storage_bm_door }}'
+
+
+
+- name: "Storage Basement Light"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.storage_bm_light }}'
+
+- name: "Basement Water Leak"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.basement_water_leak }}'
+
+- name: "Entrance Motion"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.entrance_motion }}'
+
+- name: "Entrance Main Door Opened Duration"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.main_door_lo |float|round(0) }}'
+  unit_of_measurement: "sec"
+
+- name: "Entrance Motion Detected Duration"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.entrance_motion_detected_sec }}'
+  unit_of_measurement: "sec"
+
+- name: "Stair Basement Door Opened Duration"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.stair_bm_door_hi |float|round(0) }}'
+  unit_of_measurement: "sec"
+
+- name: "Basement Door Opened Duration"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.bm_door_hi |float|round(0) }}'
+  unit_of_measurement: "sec"
+
+- name: "Back Door Opened Duration"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.back_door_lo |float|round(0) }}'
+  unit_of_measurement: "sec"
+
+- name: "Storage Basement Door Opened Duration"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.storage_bm_door_hi |float|round(0) }}'
+  unit_of_measurement: "sec"
+
+- name: "Light Entrance On State"
+  state_topic: "home/main/sensor/states"
+  value_template: '{{ value_json.entrance_light_on }}'
+
+
+# Unused signals
+- name: "Stair Temperature"
+  state_topic: "home/main/slow_sensors"
+  value_template: '{{ value_json.stair_temp |float|round(1) }}'
+  unit_of_measurement: "C"
+
+- name: "Storage Temperature"
+  state_topic: "home/main/slow_sensors"
+  value_template: '{{ value_json.storage_temp |float|round(1)}}'
+  unit_of_measurement: "C"
