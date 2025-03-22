@@ -1,0 +1,409 @@
+title: Home
+views:
+  - path: default_view
+    title: Planetvegen 18A
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - square: false
+            type: grid
+            cards:
+              - type: entities
+                entities:
+                  - entity: sensor.time
+                  - entity: sensor.date
+                  - entity: sensor.io_man_version
+                    name: IO Man Ver.
+                    icon: mdi:candy
+              - type: entities
+                entities:
+                  - entity: switch.sw_entrance_light_auto
+                    name: Light Auto
+                    card_mod:
+                      style: |
+                        :host {
+                          {% if states('input_boolean.entrance_light_auto') == 'on' %}
+                          --card-mod-icon-color: red;
+                            color: red;
+                          {% else %}
+                          --card-mod-icon-color: light-blue;
+                            color: light-blue;
+                          {% endif %}
+                          }
+                  - entity: switch.sw_entrance_light_manual_set
+                    name: Light Manual
+                    card_mod:
+                      style: |
+                        :host {
+                          {% if states('input_boolean.entrance_light_manual_set') == 'on' %}
+                          --card-mod-icon-color: red;
+                          color: red;
+                          {% else %}
+                          --card-mod-icon-color: light-blue;
+                          color: light-blue;
+                          {% endif %}
+                          }
+                  - entity: sensor.light_entrance_on_state
+                    icon: mdi:theme-light-dark
+                    name: Light Entrance
+                    card_mod:
+                      style: |
+                        :host {
+                          {% if states('sensor.light_entrance_on_state') == 'True' %}
+                          --card-mod-icon-color: orange;
+                          color: orange;
+                          {% else %}
+                          --card-mod-icon-color: light-blue;
+                          color: light-blue;
+                          {% endif %}
+                          }
+                show_header_toggle: false
+            title: Entrance Light
+            columns: 2
+          - square: false
+            type: iframe
+            url: >-
+              https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=default&metricWind=default&zoom=5&overlay=wind&product=ecmwf&level=surface&lat=61.606&lon=10.371&detailLat=63.429&detailLon=10.393&detail=true
+            aspect_ratio: 100%
+            title: Weather, Trondheim
+      - type: vertical-stack
+        cards:
+          - square: false
+            type: grid
+            cards:
+              - type: entities
+                entities:
+                  - entity: sensor.entrance_main_door
+                    icon: mdi:door-open
+                    name: Main
+                    card_mod:
+                      style: |
+                        :host {
+                          {% if is_state('sensor.entrance_main_door', 'False') %}
+                          --card-mod-icon-color: red;
+                          color: red;
+                          {% else %}
+                          --card-mod-icon-color: light-blue;
+                          color: light-blue;
+                          {% endif %}
+                          }
+                  - entity: sensor.back_door
+                    icon: mdi:door-open
+                    name: Back
+                    card_mod:
+                      style: |
+                        :host {
+                          {% if is_state('sensor.back_door', 'False') %}
+                          --card-mod-icon-color: red;
+                          color: red;
+                          {% else %}
+                          --card-mod-icon-color: light-blue;
+                          color: light-blue;
+                          {% endif %}
+                          }
+                  - entity: sensor.basement_door
+                    icon: mdi:door-open
+                    name: Basement
+                    card_mod:
+                      style: |
+                        :host {
+                          {% if is_state('sensor.basement_door', 'True') %}
+                          --card-mod-icon-color: red;
+                          color: red;
+                          {% else %}
+                          --card-mod-icon-color: light-blue;
+                          color: light-blue;
+                          {% endif %}
+                          }
+                  - entity: sensor.stair_basement_door
+                    icon: mdi:door-open
+                    name: Stair Bm
+                    card_mod:
+                      style: |
+                        :host {
+                          {% if is_state('sensor.stair_basement_door', 'True') %}
+                          --card-mod-icon-color: red;
+                          color: red;
+                          {% else %}
+                          --card-mod-icon-color: light-blue;
+                          color: light-blue;
+                          {% endif %}
+                          }
+                  - entity: sensor.storage_basement_door
+                    icon: mdi:door-open
+                    name: Storage Bm
+                    card_mod:
+                      style: |
+                        :host {
+                          {% if is_state('sensor.storage_basement_door', 'True') %}
+                          --card-mod-icon-color: red;
+                          color: red;
+                          {% else %}
+                          --card-mod-icon-color: light-blue;
+                          color: light-blue;
+                          {% endif %}
+                          }
+              - type: entities
+                entities:
+                  - entity: sensor.entrance_main_door_opened_duration
+                    name: Main
+                    icon: mdi:book-clock-outline
+                  - entity: sensor.back_door_opened_duration
+                    icon: mdi:book-clock-outline
+                    name: Back
+                  - entity: sensor.basement_door_opened_duration
+                    name: Basement
+                    icon: mdi:book-clock-outline
+                  - entity: sensor.stair_basement_door_opened_duration
+                    name: Stair Bm
+                    icon: mdi:book-clock-outline
+                  - entity: sensor.storage_basement_door_opened_duration
+                    name: Storage Bm
+                    icon: mdi:book-clock-outline
+            columns: 2
+            title: Door
+          - type: entities
+            entities:
+              - entity: sensor.storage_basement_light
+                icon: mdi:lightbulb
+              - entity: sensor.main_door_open_counter
+          - type: map
+            entities:
+              - device_tracker.tony
+              - device_tracker.thuy
+            theme_mode: auto
+            default_zoom: 11
+      - type: vertical-stack
+        cards:
+          - square: false
+            type: grid
+            cards:
+              - type: entities
+                entities:
+                  - entity: sensor.tz3000_fllyghyj_ts0201_temperature
+                    name: Temp.
+                  - entity: sensor.tz3000_fllyghyj_ts0201_humidity
+                    name: Humidity
+                  - entity: sensor.tz3000_fllyghyj_ts0201_battery
+                    name: Battery
+                title: Mobile sensor
+              - type: entities
+                entities:
+                  - entity: sensor.lumi_lumi_vibration_aq1_device_temperature
+                    name: Temp.
+                  - entity: binary_sensor.lumi_lumi_vibration_aq1_vibration
+                    name: Vibration
+                  - entity: sensor.lumi_lumi_vibration_aq1_battery
+                    name: Battery
+                title: Gara sensor
+            columns: 2
+          - square: false
+            type: grid
+            cards:
+              - type: custom:auto-entities
+                filter:
+                  include:
+                    - name: House1 Door*
+                sort:
+                  count: 10
+                card:
+                  type: custom:flex-table-card
+                  columns:
+                    - name: Name
+                      data: fname
+                    - name: State
+                      data: state
+                      align: center
+                    - name: Opened (sec)
+                      data: open_duration
+                      align: center
+                    - name: Temp
+                      data: temp
+                  strict: true
+                  auto_format: true
+                  css:
+                    thead th: 'color: black; font-weight: bold; #border: 1px solid;'
+                    tfoot *: >-
+                      border-style: solid none none none; border-width: 1px;
+                      font-weight: normal;padding-top: 5px;
+                  card_mod:
+                    style: |
+                      td, th {
+                        padding: 12px 0px 12px 0px;             /* Add padding: top-bottom 10px, left-right 15px */
+                      }
+            columns: 1
+            title: Door Summary
+        title: Sensors
+  - title: TESTING
+    path: testing
+    badges:
+      - type: entity
+        entity: sensor.tz3000_fllyghyj_ts0201_battery
+      - type: entity
+        entity: button.tz3000_fllyghyj_ts0201_identify
+      - type: entity
+        entity: update.tz3000_fllyghyj_ts0201_firmware
+      - type: entity
+        entity: sensor.tz3000_fllyghyj_ts0201_humidity
+      - type: entity
+        entity: sensor.tz3000_fllyghyj_ts0201_temperature
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: button.ikea_of_sweden_tradfri_remote_control_identify
+              - entity: sensor.ikea_of_sweden_tradfri_remote_control_battery
+            title: Entrance Light
+            show_header_toggle: false
+          - type: entity
+            entity: input_boolean.entrance_light_manual
+          - show_name: true
+            show_icon: true
+            type: button
+            tap_action:
+              action: toggle
+            entity: camera.tapo_c100_cam_sd_stream
+      - type: custom:flex-table-card
+        title: Service
+        service: script.test_response
+        entities: []
+        columns:
+          - name: Name
+            data: family
+            modify: x.name
+          - name: Version
+            data: family
+            modify: x.year
+          - name: State
+            data: family
+            modify: x.state
+      - type: entities
+        entities:
+          - entity: switch.smart_plug
+            name: SmartPlug1
+            icon: ''
+          - entity: switch.smart_plug_2
+            name: SmartPlug2
+      - type: entities
+        entities:
+          - entity: switch.cleverio_csp_100_socket_1
+            name: Socket 1
+          - entity: switch.smart_plug
+          - entity: conversation.home_assistant
+          - entity: sensor.thuy_app_version
+        title: 'Cleverio CSP-100 '
+  - type: sections
+    max_columns: 4
+    title: Devices
+    path: devices
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: New section
+          - type: entities
+            entities:
+              - entity: sensor.thuy_activity
+                name: Activity
+              - entity: sensor.thuy_audio_output
+                name: Audio Output
+              - entity: sensor.thuy_average_active_pace
+                name: Average Active Pace
+              - entity: sensor.thuy_battery_level
+                name: Battery Level
+              - entity: sensor.thuy_battery_state
+                name: Battery State
+              - entity: sensor.thuy_bssid
+                name: BSSID
+              - entity: sensor.thuy_connection_type
+                name: Connection Type
+              - entity: sensor.thuy_distance
+                name: Distance
+              - entity: sensor.thuy_floors_ascended
+                name: Floors Ascended
+              - entity: sensor.thuy_floors_descended
+                name: Floors Descended
+              - entity: binary_sensor.thuy_focus
+                name: Focus
+              - entity: sensor.thuy_geocoded_location
+                name: Geocoded Location
+              - entity: sensor.thuy_last_update_trigger
+                name: Last Update Trigger
+              - entity: sensor.thuy_location_permission
+                name: Location permission
+              - entity: sensor.thuy_sim_1
+                name: SIM 1
+              - entity: sensor.thuy_sim_2
+                name: SIM 2
+              - entity: sensor.thuy_ssid
+                name: SSID
+              - entity: sensor.thuy_steps
+                name: Steps
+              - entity: sensor.thuy_storage
+                name: Storage
+            title: THUY
+      - type: grid
+        cards:
+          - type: heading
+            heading: New section
+          - type: custom:map-card
+            history_start: 24 hours ago
+            entities:
+              - person.vnno
+              - zone.home
+              - device_tracker.tony
+              - device_tracker.thuy
+          - type: entities
+            entities:
+              - entity: sensor.tony_activity
+                name: Activity
+              - entity: sensor.tony_average_active_pace
+                name: Average Active Pace
+              - entity: sensor.tony_battery_level
+                name: Battery Level
+              - entity: sensor.tony_battery_state
+                name: Battery State
+              - entity: sensor.tony_bssid
+                name: BSSID
+              - entity: sensor.tony_connection_type
+                name: Connection Type
+              - entity: sensor.tony_distance
+                name: Distance
+              - entity: sensor.tony_floors_ascended
+                name: Floors Ascended
+              - entity: sensor.tony_floors_descended
+                name: Floors Descended
+              - entity: binary_sensor.tony_focus
+                name: Focus
+              - entity: sensor.tony_geocoded_location
+                name: Geocoded Location
+              - entity: sensor.tony_last_update_trigger
+                name: Last Update Trigger
+              - entity: sensor.tony_sim_1
+                name: SIM 1
+              - entity: sensor.tony_ssid
+                name: SSID
+              - entity: sensor.tony_steps
+                name: Steps
+              - entity: sensor.tony_storage
+                name: Storage
+            title: TONY
+  - type: sections
+    max_columns: 4
+    title: Version
+    path: version
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: New section
+          - type: entities
+            entities:
+              - entity: sensor.fw_version
+              - entity: sensor.current_version
+              - entity: sensor.io_man_version
+              - entity: sensor.home_assistant_versions
+                name: Hass Release
+              - entity: update.hacs_update
