@@ -17,7 +17,7 @@ services:
 #      - MQTT_USER
 #      - MQTT_PWD
       - MQTT_USER=vnno
-      - MQTT_PWD=Planetvegen18A
+      - MQTT_PWD=Planetvegen
     logging:
       driver: "json-file"
       options:
