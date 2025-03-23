@@ -18,9 +18,14 @@ MQTT_USER = os.getenv('MQTT_USER')
 MQTT_PWD = os.getenv('MQTT_PWD')
 
 rpi = revpimodio2.RevPiModIO(autorefresh=True)
+rpi.cycletime = 500
+#rpi = revpimodio2.RevPiModIO()
+#rpi.set_refresh_interval(100)  # Example method (check documentation for exact method)
+
+
 print("DIO monitoring")
 
-IO_MAN_VERSION = '1.3'
+IO_MAN_VERSION = '1.5'
 
 broker = '127.0.0.1'
 port = 1883
@@ -28,6 +33,9 @@ port = 1883
 entrance_light_auto = False       # working mode
 entrance_light_auto_set = False
 entrance_light_manual_set = False
+
+entrance_light_on_old = False
+entrance_light_on = False
 
 
 # TOPICS TO TRANSMIT
@@ -90,7 +98,15 @@ def loop(cycletools):
   time.sleep(1)
     
     
-def publish(client):
+def io_man(client):
+
+  global entrance_light_auto
+  global entrance_light_auto_set
+  global entrance_light_manual_set
+
+  global entrance_light_on_old
+  global entrance_light_on
+
   msg_count = 1
   epoch_old = 0
 
@@ -101,6 +117,8 @@ def publish(client):
     io_time_hi_start[idx] = epoch_val
 
   while True:
+#    rpi.cycleloop()                 # Ensure you're calling the correct method for manual cycles
+
     epoch_val = time.time()
     
     ts = datetime.datetime.now()
@@ -117,18 +135,16 @@ def publish(client):
 #    rpi.io.O_1.value = io_val[0]
 
     if entrance_light_auto == False:               # manual mode
-      rpi.io.O_1.value = entrance_light_manual_set
+      entrance_light_on = entrance_light_manual_set
     else:
-      rpi.io.O_1.value = entrance_light_auto_set
+      entrance_light_on = entrance_light_auto_set
+
+    rpi.io.O_1.value = entrance_light_on
       
     rpi.io.O_2.value = entrance_light_manual_set
 
-    print(f"----> entrance_light_manual_set: `{entrance_light_manual_set}`", flush=True)
-    print(f"----> entrance_light_auto_set: `{entrance_light_auto_set}`", flush=True)
-    print(f"----> entrance_light_auto: `{entrance_light_auto}`", flush=True)
-
-    print(f"----> rpi.io.O_1.value: `{rpi.io.O_1.value}`", flush=True)
-    print(f"----> rpi.io.O_2.value: `{rpi.io.O_2.value}`", flush=True)
+#    print(f"----> rpi.io.O_1.value: `{rpi.io.O_1.value}`", flush=True)
+#    print(f"----> rpi.io.O_2.value: `{rpi.io.O_2.value}`", flush=True)
 
 
     msg=json.dumps({"timestamp": ts.strftime("%Y-%m-%d %H:%M:%S%z"),
@@ -139,8 +155,8 @@ def publish(client):
       "storage_bm_door": io_val[3],
       "bm_door": io_val[4],
       "entrance_motion": io_val[5],
-      "light_storage_bm": io_val[6],
-      "water_leak_bm": io_val[7],
+      "storage_bm_light": io_val[6],
+      "bm_water_leak": io_val[7],
 
       "main_door_lo": io_time_lo[0],
       "back_door_lo": io_time_lo[1],
@@ -148,8 +164,8 @@ def publish(client):
       "storage_bm_door_lo": io_time_lo[3],
       "bm_door_lo": io_time_lo[4],
       "entrance_motion_lo": io_time_lo[5],
-      "light_storage_bm_lo": io_time_lo[6],
-      "water_leak_bm_lo": io_time_lo[7],
+      "storage_bm_light_lo": io_time_lo[6],
+      "bm_water_leak_lo": io_time_lo[7],
 
       "main_door_hi": io_time_hi[0],
       "back_door_hi": io_time_hi[1],
@@ -157,19 +173,25 @@ def publish(client):
       "storage_bm_door_hi": io_time_hi[3],
       "bm_door_hi": io_time_hi[4],
       "entrance_motion_hi": io_time_hi[5],
-      "light_storage_bm_hi": io_time_hi[6],
-      "water_leak_bm_hi": io_time_hi[7],
+      "storage_bm_light_hi": io_time_hi[6],
+      "bm_water_leak_hi": io_time_hi[7],
 
-      "version":  "1.1"});
+      "entrance_light_on": entrance_light_on,
+      "entrance_light_auto": entrance_light_auto,
+      "entrance_light_auto_set": entrance_light_auto_set,
+      "entrance_light_manual_set": entrance_light_manual_set, 
+
+      "version":  "1.1"})
 
     epoch_diff = epoch_val - epoch_old
     # ONLY publish if data is updated or longer than 1 minute
     if io_old[0] == io_val[0] and io_old[1] == io_val[1] and io_old[2] == io_val[2] and io_old[3] == io_val[3] \
      and io_old[4] == io_val[4] and io_old[5] == io_val[5] and io_old[6] == io_val[6] and io_old[7] == io_val[7] \
-     and epoch_diff < 60:
+     and entrance_light_on_old == entrance_light_on and epoch_diff < 60:
       continue
 
     epoch_old = epoch_val
+    entrance_light_on_old = entrance_light_on
 
     for idx, val in enumerate(io_val):
       if io_old[idx] == True and io_val[idx] == False: # faling edge
@@ -185,8 +207,7 @@ def publish(client):
       elif io_val[idx] == True: # HI
         io_time_hi[idx] = epoch_val - io_time_hi_start[idx]
 
-      io_old[idx] = io_val[idx] 
-
+      io_old[idx] = io_val[idx]
 
     time.sleep(2)
 #     msg = f"messages: {msg_count}"
@@ -216,6 +237,7 @@ def subscribe(client: mqtt_client, topic):
 
   def on_message(client, userdata, msg):
     global entrance_light_auto
+    global entrance_light_auto_set
     global entrance_light_manual_set
     
     print(f"Received `{msg.payload.decode()}` from topic: `{msg.topic}`", flush=True)
@@ -241,6 +263,9 @@ def subscribe(client: mqtt_client, topic):
       else:
         entrance_light_manual_set = False
 
+    print(f"----> entrance_light_manual_set: `{entrance_light_manual_set}`", flush=True)
+    print(f"----> entrance_light_auto_set: `{entrance_light_auto_set}`", flush=True)
+    print(f"----> entrance_light_auto: `{entrance_light_auto}`", flush=True)
 
     result = client.publish(topic_fb_all, msg.topic + msg.payload.decode())
     status = result[0]
@@ -260,7 +285,7 @@ def run():
   subscribe(client, topic_entrance_light_auto_set)
   subscribe(client, topic_entrance_light_manual_set)
   
-  publish(client)
+  io_man(client)
   client.loop_stop()
 
 
