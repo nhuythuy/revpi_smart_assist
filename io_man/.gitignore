@@ -1,0 +1,6 @@
+# Local credentials -- never commit. Copy secrets.example.py -> secrets.py.
+secrets.py
+
+# Python
+__pycache__/
+*.pyc

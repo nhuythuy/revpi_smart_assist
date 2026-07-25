@@ -15,6 +15,8 @@ WORKDIR /usr/app/src
 
 #to COPY the remote file at working directory in container
 COPY main.py ./
+# Credentials (git-ignored). Must exist locally: cp secrets.example.py secrets.py
+COPY secrets.py ./
 # Now the structure looks like this '/usr/app/src/main.py'
 
 

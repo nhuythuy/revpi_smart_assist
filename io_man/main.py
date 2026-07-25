@@ -13,9 +13,27 @@ from paho.mqtt import client as mqtt_client
 
 #load_dotenv()
 
+# Credentials live in secrets.py (git-ignored). On a fresh clone, copy the
+# template:  cp secrets.example.py secrets.py  and fill in real values.
+try:
+  import secrets as app_secrets
+  _ = app_secrets.HIVEMQ_HOST  # confirm it's our file, not the stdlib module
+except (ImportError, AttributeError):
+  raise SystemExit(
+    "Missing or incomplete io_man/secrets.py -- copy secrets.example.py to "
+    "secrets.py and fill in the credentials.")
+
 VESSEL_ID = os.getenv('VESSEL_ID')
-MQTT_USER = os.getenv('MQTT_USER')
-MQTT_PWD = os.getenv('MQTT_PWD')
+# Local broker creds: prefer env (set by compose.yaml), else fall back to secrets.py.
+MQTT_USER = os.getenv('MQTT_USER', app_secrets.MQTT_USER)
+MQTT_PWD = os.getenv('MQTT_PWD', app_secrets.MQTT_PWD)
+
+# HiveMQ Cloud broker (TLS, port 8883, username/password auth) -- same cluster
+# the ESP32 OLED node publishes to.
+HIVEMQ_HOST = app_secrets.HIVEMQ_HOST
+HIVEMQ_PORT = app_secrets.HIVEMQ_PORT
+HIVEMQ_USER = app_secrets.HIVEMQ_USER
+HIVEMQ_PWD = app_secrets.HIVEMQ_PWD
 
 rpi = revpimodio2.RevPiModIO(autorefresh=True)
 rpi.cycletime = 500
@@ -88,6 +106,36 @@ def connect_mqtt():
   client.connect(broker, port)
   return client
 
+# Separate client ID for the HiveMQ Cloud connection (must be unique per broker).
+hive_client_id = f'iohive-{random.randint(0, 1000)}'
+
+def connect_hivemq():
+  """Connect to HiveMQ Cloud over TLS. Uses connect_async() + loop_start() so
+  the connection (and any reconnects) happen in the background -- a cloud outage
+  never blocks or stalls the local IO control loop."""
+  def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+      print("Connected to HiveMQ Cloud!", flush=True)
+    else:
+      print(f"HiveMQ connect failed, rc={rc}", flush=True)
+
+  def on_disconnect(client, userdata, rc):
+    print(f"HiveMQ disconnected, rc={rc} (auto-reconnecting)", flush=True)
+
+  client = mqtt_client.Client(hive_client_id)
+  client.username_pw_set(HIVEMQ_USER, HIVEMQ_PWD)
+  # HiveMQ Cloud is TLS-only on 8883. tls_set() with no args validates the
+  # broker's (publicly-trusted) certificate against the system CA store. To skip
+  # validation like the ESP32's setInsecure(), instead use:
+  #   client.tls_set(cert_reqs=ssl.CERT_NONE); client.tls_insecure_set(True)
+  client.tls_set()
+  client.on_connect = on_connect
+  client.on_disconnect = on_disconnect
+  client.reconnect_delay_set(min_delay=1, max_delay=60)
+  client.connect_async(HIVEMQ_HOST, HIVEMQ_PORT)
+  client.loop_start()
+  return client
+
 def loop(cycletools):
   timestamp_milliseconds = int(round(time.time() * 1000))
 
@@ -98,7 +146,7 @@ def loop(cycletools):
   time.sleep(1)
     
     
-def io_man(client):
+def io_man(client, hive_client=None):
 
   global entrance_light_auto
   global entrance_light_auto_set
@@ -211,13 +259,25 @@ def io_man(client):
 
     time.sleep(2)
 #     msg = f"messages: {msg_count}"
-    result = client.publish(topic_states, msg)
+    result = client.publish(topic_states, msg, retain=True)  # retain so a dashboard that (re)subscribes immediately gets the latest state
     # result: [0, 1]
     status = result[0]
     if status == 0:
       print(f"Send `{msg}` to topic `{topic_states}`", flush=True)
     else:
       print(f"Failed to send message to topic {topic_states}", flush=True)
+
+    # Mirror the same sensor data to HiveMQ Cloud, retained so a dashboard that
+    # (re)subscribes immediately gets the latest state. Publishing while the
+    # cloud link is down just returns a non-zero rc; the background loop keeps
+    # reconnecting -- it never blocks the local IO control above.
+    if hive_client is not None:
+      hive_result = hive_client.publish(topic_states, msg, retain=True)
+      if hive_result[0] == 0:
+        print(f"Send `{msg}` to HiveMQ topic `{topic_states}` (retained)", flush=True)
+      else:
+        print(f"Failed to send to HiveMQ topic {topic_states} (rc={hive_result[0]})", flush=True)
+
     msg_count += 1
 #        if msg_count > 5:
 #            break
@@ -280,13 +340,24 @@ def subscribe(client: mqtt_client, topic):
 def run():
   client = connect_mqtt()
   client.loop_start()
-  
+
+  # Also publish to HiveMQ Cloud. Guard the setup so a cloud/TLS/DNS problem at
+  # startup can never stop the local broker + IO control from running.
+  hive_client = None
+  try:
+    hive_client = connect_hivemq()
+  except Exception as e:
+    print(f"HiveMQ setup failed, continuing local-only: {e}", flush=True)
+
   subscribe(client, topic_entrance_light_auto)
   subscribe(client, topic_entrance_light_auto_set)
   subscribe(client, topic_entrance_light_manual_set)
-  
-  io_man(client)
+
+  io_man(client, hive_client)
+
   client.loop_stop()
+  if hive_client is not None:
+    hive_client.loop_stop()
 
 
 if __name__ == '__main__':
