@@ -20,23 +20,31 @@ services:
         max-file: "5"
 
 
-  io_main:
+  io_man:
     build:
-      context: ./io_main/
-#      context: ./canx_to_mqtt/
+      context: ./io_man/
       dockerfile: Dockerfile
-    hostname: io_main
+    hostname: io_man
+    devices:
+      - /dev/piControl0:/dev/piControl0
     volumes:
       - /etc/revpi/config.rsc:/etc/revpi/config.rsc
+    network_mode: host
+    environment:
+      - VESSEL_ID
+      - MQTT_USER=vnno
+      - MQTT_PWD=
+    depends_on:
+      - mosquitto
     logging:
-      driver: "json-file"
+      driver: journald
       options:
-        max-size: "5m"
-        max-file: "2"
+        tag: io_man
+#      driver: "json-file"
+#      options:
+#        max-size: "5m"
+#        max-file: "2"
     restart: unless-stopped
-#    depends_on:
-#      - mosquitto
-
 
 
   homeassistant:
