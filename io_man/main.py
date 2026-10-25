@@ -32,16 +32,19 @@ HIVEMQ_USER = app_secrets.HIVEMQ_USER
 HIVEMQ_PWD = app_secrets.HIVEMQ_PWD
 
 rpi = revpimodio2.RevPiModIO(autorefresh=True)
-rpi.cycletime = 500
+# revpimodio2's refresh thread retries IO errors on the process image with no
+# delay (a 100% CPU spin). Give up after this many errors instead; Docker's
+# restart policy then brings the container back up cleanly.
+rpi.maxioerrors = 100
 
 print("DIO monitoring", flush=True)
 
-IO_MAN_VERSION = '1.6'
+IO_MAN_VERSION = '1.7'
 
 broker = '127.0.0.1'
 port = 1883
 
-LOOP_INTERVAL = 0.1   # seconds between IO cycles (prevents a 100% CPU busy loop)
+CYCLE_TIME_MS = 100   # IO cycle: one run per process image refresh (5..2000 ms)
 
 entrance_light_auto = False       # working mode: True = auto, False = manual
 entrance_light_auto_set = False   # lamp state requested while in auto mode
@@ -176,11 +179,8 @@ def connect_hivemq():
 
 
 def io_man(client, hive_client=None):
-
-  global entrance_light_on_old
-  global entrance_light_on
-
-  epoch_old = 0
+  """Run the IO logic via revpimodio2's cycleloop: cycle() is called once after
+  each process image refresh, and the thread sleeps in between (no polling)."""
 
   epoch_val = time.time()
   # Init
@@ -188,8 +188,12 @@ def io_man(client, hive_client=None):
     io_time_lo_start[idx] = epoch_val
     io_time_hi_start[idx] = epoch_val
 
-  while True:
-    time.sleep(LOOP_INTERVAL)
+  epoch_old = 0
+
+  def cycle(ct):
+    nonlocal epoch_old
+    global entrance_light_on_old
+    global entrance_light_on
 
     epoch_val = time.time()
 
@@ -216,7 +220,7 @@ def io_man(client, hive_client=None):
     # ONLY publish if data is updated or longer than 1 minute
     if io_old[:8] == io_val[:8] \
        and entrance_light_on_old == entrance_light_on and epoch_diff < 60:
-      continue
+      return  # must return None: any other value ends the cycleloop
 
     epoch_old = epoch_val
     entrance_light_on_old = entrance_light_on
@@ -289,6 +293,8 @@ def io_man(client, hive_client=None):
         print(f"Send `{msg}` to HiveMQ topic `{topic_states}` (retained)", flush=True)
       else:
         print(f"Failed to send to HiveMQ topic {topic_states} (rc={hive_result[0]})", flush=True)
+
+  rpi.cycleloop(cycle, cycletime=CYCLE_TIME_MS)
 
 
 def run():
